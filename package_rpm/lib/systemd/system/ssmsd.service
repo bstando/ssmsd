@@ -1,0 +1,9 @@
+[Unit]
+Description=Simple Sensor Management System Daemon
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/ssmsd -i 600 -d /var/ssmsd/database.db -l /var/log/ssmsd/
+
+[Install]
+WantedBy=default.target

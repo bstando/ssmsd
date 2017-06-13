@@ -1,0 +1,6 @@
+[submodule "ArduinoJson"]
+	path = ArduinoJson
+	url = https://github.com/bblanchon/ArduinoJson.git
+[submodule "sqlite_modern_cpp"]
+	path = sqlite_modern_cpp
+	url = https://github.com/aminroosta/sqlite_modern_cpp.git
