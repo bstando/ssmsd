@@ -31,7 +31,7 @@ private:
 
     vector<std::string> prepareAllDataResponse();
     vector<std::string> prepareDataResponse(int limit);
-    vector<std::string> prepareByDateResponse(String date);
+    vector<std::string> prepareByDateResponse(std::string date);
     vector<std::string> prepareBySensorIDResponse(int sensorID);
     vector<std::string> prepareSensorIDsResponse();
     vector<std::string> prepareEmptyResponse();

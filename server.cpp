@@ -67,7 +67,7 @@ namespace
 boost::mutex service_mutex;
 
 
-void error(String msg) {
+void error(std::string msg) {
     perror(msg.c_str());
     //exit(1);
 }

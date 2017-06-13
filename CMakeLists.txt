@@ -7,10 +7,10 @@ set(Boost_USE_STATIC_LIBS   ON)
 FIND_PACKAGE( Boost 1.58 COMPONENTS REQUIRED log system log_setup program_options thread filesystem date_time )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 INCLUDE_DIRECTORIES( sqlite_modern_cpp/hdr )
+INCLUDE_DIRECTORIES( ArduinoJson/src/ )
 
 set(CMAKE_CXX_FLAGS " -std=c++11")
 
-add_subdirectory(ArduinoJson/src)
 
 add_executable(ssmsd
     server.cpp
@@ -18,4 +18,4 @@ add_executable(ssmsd
         db_helper.cpp db_helper.hpp
         sensor.cpp sensor.hpp Zeroconf.cpp Zeroconf.hpp)
 
-target_link_libraries(ssmsd ArduinoJson sqlite3 avahi-client avahi-common pthread ${Boost_LIBRARIES})
+target_link_libraries(ssmsd sqlite3 avahi-client avahi-common pthread ${Boost_LIBRARIES})

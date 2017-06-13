@@ -35,7 +35,7 @@ vector<std::string> DataExchangeServer::prepareAllDataResponse() {
         {
             response.set<bool>("has_next", false);
         }
-        String line;
+	std::string line;
         response.printTo(line);
         retval.push_back(line);
         //cout << "Chunk size: " << j << ", Content length: " << line.length() << ", current pos: " << i << " of " << sensorData.size() << endl;
@@ -47,7 +47,7 @@ vector<std::string> DataExchangeServer::prepareAllDataResponse() {
         response.set<int>("content_length", 0);
         JsonArray &sensorDataArray = response.createNestedArray("content");
         response.set<bool>("has_next", false);
-        String line;
+	std::string line;
         response.printTo(line);
         retval.push_back(line);
     }
@@ -188,7 +188,7 @@ DataExchangeServer::~DataExchangeServer() {
     delete helper;
 }
 
-vector<std::string> DataExchangeServer::prepareByDateResponse(String date) {
+vector<std::string> DataExchangeServer::prepareByDateResponse(std::string date) {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
     vector<SensorData> sensorData = helper->getByDate(date);
@@ -214,7 +214,7 @@ vector<std::string> DataExchangeServer::prepareByDateResponse(String date) {
         } else {
             response.set<bool>("has_next", false);
         }
-        String line;
+	std::string line;
         response.printTo(line);
         retval.push_back(line);
         //cout << "Chunk size: " << j << ", Content length: " << line.length() << ", current pos: " << i << " of " << sensorData.size() << endl;
@@ -227,7 +227,7 @@ vector<std::string> DataExchangeServer::prepareByDateResponse(String date) {
         response.set<int>("content_length", 0);
         JsonArray &sensorDataArray = response.createNestedArray("content");
         response.set<bool>("has_next", false);
-        String line;
+	std::string line;
         response.printTo(line);
         retval.push_back(line);
     }
@@ -263,7 +263,7 @@ vector<std::string> DataExchangeServer::prepareDataResponse(int limit) {
         } else {
             response.set<bool>("has_next", false);
         }
-        String line;
+	std::string line;
         response.printTo(line);
         retval.push_back(line);
         BOOST_LOG_TRIVIAL(debug) << "Chunk size: " << j << ", Content length: " << line.length() << ", current pos: " << i << " of " <<
@@ -275,7 +275,7 @@ vector<std::string> DataExchangeServer::prepareDataResponse(int limit) {
         response.set<int>("content_length", 0);
         JsonArray &sensorDataArray = response.createNestedArray("content");
         response.set<bool>("has_next", false);
-        String line;
+	std::string line;
         response.printTo(line);
         retval.push_back(line);
     }
@@ -308,7 +308,7 @@ vector<std::string> DataExchangeServer::prepareBySensorIDResponse(int sensorID) 
         } else {
             response.set<bool>("has_next", false);
         }
-        String line;
+	std::string line;
         response.printTo(line);
         retval.push_back(line);
         //cout << "Chunk size: " << j << ", Content length: " << line.length() << ", current pos: " << i << " of " << sensorData.size() << endl;
@@ -321,7 +321,7 @@ vector<std::string> DataExchangeServer::prepareBySensorIDResponse(int sensorID) 
         response.set<int>("content_length", 0);
         JsonArray &sensorDataArray = response.createNestedArray("content");
         response.set<bool>("has_next", false);
-        String line;
+	std::string line;
         response.printTo(line);
         retval.push_back(line);
     }
@@ -336,7 +336,7 @@ vector<std::string> DataExchangeServer::prepareEmptyResponse() {
     response.set<int>("content_length", 0);
     JsonArray &sensorDataArray = response.createNestedArray("content");
     response.set<bool>("has_next", false);
-    String line;
+    std::string line;
     response.printTo(line);
     retval.push_back(line);
     return retval;
@@ -363,7 +363,7 @@ vector<std::string> DataExchangeServer::prepareSensorIDsResponse() {
         } else {
             response.set<bool>("has_next", false);
         }
-        String line;
+	std::string line;
         response.printTo(line);
         retval.push_back(line);
         //cout << "Chunk size: " << j << ", Content length: " << line.length() << ", current pos: " << i << " of " << sensorData.size() << endl;
@@ -376,7 +376,7 @@ vector<std::string> DataExchangeServer::prepareSensorIDsResponse() {
         response.set<int>("content_length", 0);
         JsonArray &sensorDataArray = response.createNestedArray("content");
         response.set<bool>("has_next", false);
-        String line;
+	std::string line;
         response.printTo(line);
         retval.push_back(line);
     }
