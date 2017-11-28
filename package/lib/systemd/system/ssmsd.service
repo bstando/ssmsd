@@ -1,5 +1,7 @@
 [Unit]
 Description=Simple Sensor Management System Daemon
+Wants=avahi-daemon.service
+After=network.target avahi-daemon.service
 
 [Service]
 Type=forking
