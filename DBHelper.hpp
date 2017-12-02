@@ -20,14 +20,14 @@ class DBHelper {
 	//DBHelper();
 	DBHelper(const string& filename);
 	~DBHelper();
-	bool initializeDatabase();
-	void insertData(int sensorID, string date, float temperature, float humidity);
-	void insertSensorData(SensorData data);
-	vector<SensorData> getAllData();
-	vector<SensorData> getLastData(int limit);
-	vector<SensorData> getByDate(string date);
-	vector<SensorData> getBySensorID(int sensorID);
-	vector<int> getSensorIDs();
+	bool InitializeDatabase();
+	void InsertData(int sensorID, string date, float temperature, float humidity);
+	void InsertSensorData(SensorData data);
+	vector<SensorData> GetAllData();
+	vector<SensorData> GetLastData(int limit);
+	vector<SensorData> GetByDate(string date);
+	vector<SensorData> GetBySensorID(int sensorID);
+	vector<int> GetSensorIDs();
 };
 
 #endif

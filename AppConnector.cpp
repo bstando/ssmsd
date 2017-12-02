@@ -10,7 +10,7 @@ using namespace std;
 vector<std::string> AppConnector::prepareAllDataResponse() {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
-    vector<SensorData> sensorData = helper->getAllData();
+    vector<SensorData> sensorData = helper->GetAllData();
     //cout << "Data size: " << sensorData.size() << endl;
     BOOST_LOG_TRIVIAL(debug)  << "Data size: " << sensorData.size() << endl;
     for (long i = 0; i < sensorData.size() ; i+=10) {
@@ -191,7 +191,7 @@ AppConnector::~AppConnector() {
 vector<std::string> AppConnector::prepareByDateResponse(std::string date) {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
-    vector<SensorData> sensorData = helper->getByDate(date);
+    vector<SensorData> sensorData = helper->GetByDate(date);
     //cout << "Data size: " << sensorData.size() << endl;
     BOOST_LOG_TRIVIAL(debug) << "Data size: "<<sensorData.size();
     for (long i = 0; i < sensorData.size(); i += 10) {
@@ -240,7 +240,7 @@ vector<std::string> AppConnector::prepareByDateResponse(std::string date) {
 vector<std::string> AppConnector::prepareDataResponse(int limit) {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
-    vector<SensorData> sensorData = helper->getLastData(limit);
+    vector<SensorData> sensorData = helper->GetLastData(limit);
     //cout << "Data size: " << sensorData.size() << endl;
     BOOST_LOG_TRIVIAL(debug) << "Data size: "<<sensorData.size();
     for (long i = 0; i < sensorData.size(); i += 10) {
@@ -286,7 +286,7 @@ vector<std::string> AppConnector::prepareDataResponse(int limit) {
 vector<std::string> AppConnector::prepareBySensorIDResponse(int sensorID) {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
-    vector<SensorData> sensorData = helper->getBySensorID(sensorID);
+    vector<SensorData> sensorData = helper->GetBySensorID(sensorID);
     BOOST_LOG_TRIVIAL(debug) << "Data size: " << sensorData.size();
     for (long i = 0; i < sensorData.size(); i += 10) {
         JsonObject &response = jsonBuffer.createObject();
@@ -345,7 +345,7 @@ vector<std::string> AppConnector::prepareEmptyResponse() {
 vector<std::string> AppConnector::prepareSensorIDsResponse() {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
-    vector<int> sensorData = helper->getSensorIDs();
+    vector<int> sensorData = helper->GetSensorIDs();
     //cout << "Data size: " << sensorData.size() << endl;
     BOOST_LOG_TRIVIAL(debug) << "Data size: " << sensorData.size();
     for (long i = 0; i < sensorData.size(); i += 10) {

@@ -17,7 +17,7 @@ DBHelper::~DBHelper() {
 	delete db;
 }
 
-bool DBHelper::initializeDatabase() {
+bool DBHelper::InitializeDatabase() {
 	boost::mutex::scoped_lock lock(database_mutex);
 	try {
 		*db << "CREATE TABLE IF NOT EXISTS sensor "
@@ -39,7 +39,7 @@ bool DBHelper::initializeDatabase() {
 	return false;
 }
 
-void DBHelper::insertData(int sensorID, string date, float temperature, float humidity) {
+void DBHelper::InsertData(int sensorID, string date, float temperature, float humidity) {
 	boost::mutex::scoped_lock lock(database_mutex);
 	try {
 		*db << "INSERT INTO sensor (sensorID, date, temperature,humidity) values (?,?,?,?);"
@@ -55,7 +55,7 @@ void DBHelper::insertData(int sensorID, string date, float temperature, float hu
 	}
 }
 
-void DBHelper::insertSensorData(SensorData data) {
+void DBHelper::InsertSensorData(SensorData data) {
 	boost::mutex::scoped_lock lock(database_mutex);
 	try {
 		*db << "INSERT INTO sensor (sensorID, date, temperature,humidity) values (?,?,?,?);"
@@ -71,7 +71,7 @@ void DBHelper::insertSensorData(SensorData data) {
 	}
 }
 
-vector<SensorData> DBHelper::getAllData() {
+vector<SensorData> DBHelper::GetAllData() {
 	vector<SensorData> *retval = new vector<SensorData>();
 	boost::mutex::scoped_lock lock(database_mutex);
 	try {
@@ -94,7 +94,7 @@ vector<SensorData> DBHelper::getAllData() {
 	return *retval;
 }
 
-vector<SensorData> DBHelper::getLastData(int limit) {
+vector<SensorData> DBHelper::GetLastData(int limit) {
 	vector<SensorData> *retval = new vector<SensorData>();
 	boost::mutex::scoped_lock lock(database_mutex);
 	try {
@@ -118,7 +118,7 @@ vector<SensorData> DBHelper::getLastData(int limit) {
 	return *retval;
 }
 
-vector<SensorData> DBHelper::getByDate(string date) {
+vector<SensorData> DBHelper::GetByDate(string date) {
 	vector<SensorData> *retval = new vector<SensorData>();
 	boost::mutex::scoped_lock lock(database_mutex);
 	try {
@@ -141,7 +141,7 @@ vector<SensorData> DBHelper::getByDate(string date) {
 	return *retval;
 }
 
-vector<SensorData> DBHelper::getBySensorID(int sensorID) {
+vector<SensorData> DBHelper::GetBySensorID(int sensorID) {
 	vector<SensorData> *retval = new vector<SensorData>();
 	boost::mutex::scoped_lock lock(database_mutex);
 	try {
@@ -164,7 +164,7 @@ vector<SensorData> DBHelper::getBySensorID(int sensorID) {
 	return *retval;
 }
 
-vector<int> DBHelper::getSensorIDs() {
+vector<int> DBHelper::GetSensorIDs() {
 	vector<int> *retval = new vector<int>();
 	boost::mutex::scoped_lock lock(database_mutex);
 	try {

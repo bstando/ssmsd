@@ -122,7 +122,7 @@ SensorData SensorConnector::DownloadData(const char *host, int port) {
 }
 
 void SensorConnector::SaveToDatabase(SensorData data) {
-    dbHelper->insertSensorData(data);
+    dbHelper->InsertSensorData(data);
 }
 
 void SensorConnector::StartCollecting() {
