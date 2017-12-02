@@ -22,8 +22,7 @@ namespace zeroconf {
     }
 
     bool Zeroconf::addListener(const std::string &type) {
-        if(invalid_object)
-        {
+        if (invalid_object) {
             //TODO: Write to log
             //std::cerr << "Invalid object Error" << std::endl;
             BOOST_LOG_TRIVIAL(fatal) << "Invalid object Error";
@@ -42,9 +41,8 @@ namespace zeroconf {
         }
         AvahiServiceBrowser *serviceBrowser = NULL;
         avahi_threaded_poll_lock(threaded_poll);
-        if(!(serviceBrowser = avahi_service_browser_new(client,interface,permitted_protocols,type.c_str(),NULL,
-                                                        static_cast<AvahiLookupFlags>(0),discovery_callback,this)))
-        {
+        if (!(serviceBrowser = avahi_service_browser_new(client, interface, permitted_protocols, type.c_str(), NULL,
+                                                         static_cast<AvahiLookupFlags>(0), discovery_callback, this))) {
             //TODO: Write to log
             //std::cerr << "Service Browser couldn't start" << std::endl;
             BOOST_LOG_TRIVIAL(fatal) << "Service Browser couldn't start";
@@ -65,21 +63,19 @@ namespace zeroconf {
         {
             boost::mutex::scoped_lock lock(service_mutex);
             service_bimap::right_const_iterator iter = established_services.right.find(service);
-            if (iter != established_services.right.end())
-            {
+            if (iter != established_services.right.end()) {
                 group = iter->second;
                 established_services.right.erase(service);
                 erased = true;
-                BOOST_LOG_TRIVIAL(info) << "Zeroconf: removing service [" << service.name << "][" << service.type << "]";
-            }
-            else
-            {
+                BOOST_LOG_TRIVIAL(info) << "Zeroconf: removing service [" << service.name << "][" << service.type
+                                        << "]";
+            } else {
                 BOOST_LOG_TRIVIAL(error) <<
-                "Zeroconf: couldn't remove not currently advertised service [" << service.name << "][" << service.type << "]";
+                                         "Zeroconf: couldn't remove not currently advertised service [" << service.name
+                                         << "][" << service.type << "]";
             }
         }
-        if (group)
-        {
+        if (group) {
             avahi_threaded_poll_lock(threaded_poll);
             avahi_entry_group_reset(group);
             avahi_entry_group_free(group);
@@ -95,29 +91,23 @@ namespace zeroconf {
         {
             boost::mutex::scoped_lock lock(service_mutex);
             discovery_bimap::right_iterator browser_iter = discovery_service_types.right.find(type);
-            if (browser_iter == discovery_service_types.right.end())
-            {
+            if (browser_iter == discovery_service_types.right.end()) {
                 //TODO: Write to log
-                BOOST_LOG_TRIVIAL(fatal) << "Zeroconf : not currently listening for '" << type << "', aborting listener removal.";
+                BOOST_LOG_TRIVIAL(fatal) << "Zeroconf : not currently listening for '" << type
+                                         << "', aborting listener removal.";
                 return false;
-            }
-            else
-            {
+            } else {
                 //TODO: Write to log
                 service_browser = browser_iter->second;
                 // delete internal browser pointers and storage
                 discovery_service_types.right.erase(browser_iter);
                 // delete internally resolved list
                 discovered_service_set::iterator iter = discovered_services.begin();
-                while (iter != discovered_services.end())
-                {
-                    if ((*iter)->service.type == type)
-                    {
+                while (iter != discovered_services.end()) {
+                    if ((*iter)->service.type == type) {
                         //TODO: Write to log
                         discovered_services.erase(iter++);
-                    }
-                    else
-                    {
+                    } else {
                         //TODO: Write to log
                         ++iter;
                     }
@@ -125,8 +115,7 @@ namespace zeroconf {
             }
         }
         /* Remove the avahi browser */
-        if (service_browser)
-        {
+        if (service_browser) {
             avahi_threaded_poll_lock(threaded_poll);
             avahi_service_browser_free(service_browser);
             avahi_threaded_poll_unlock(threaded_poll);
@@ -137,54 +126,49 @@ namespace zeroconf {
 
     void Zeroconf::entry_group_callback(AvahiEntryGroup *g, AvahiEntryGroupState state, void *userdata) {
 
-        Zeroconf *zeroconf = static_cast<Zeroconf*>(userdata);
-        switch (state)
-        {
-            case AVAHI_ENTRY_GROUP_ESTABLISHED:
-            {
+        Zeroconf *zeroconf = static_cast<Zeroconf *>(userdata);
+        switch (state) {
+            case AVAHI_ENTRY_GROUP_ESTABLISHED: {
                 ZeroconfService service;
                 {
                     boost::mutex::scoped_lock lock(zeroconf->service_mutex);
                     service_bimap::left_const_iterator left = zeroconf->committed_services.left.find(g);
-                    if (left != zeroconf->committed_services.left.end())
-                    {
+                    if (left != zeroconf->committed_services.left.end()) {
                         service = left->second;
-                    }
-                    else
-                    {
+                    } else {
 
-                        BOOST_LOG_TRIVIAL(fatal)<< "Zeroconf : should never reach here, please report a bug in zeroconf_avahi's entry_group_callback." ;
+                        BOOST_LOG_TRIVIAL(fatal)
+                            << "Zeroconf : should never reach here, please report a bug in zeroconf_avahi's entry_group_callback.";
                         return;
                     }
                     zeroconf->established_services.insert(service_bimap::value_type(g, service));
                     zeroconf->committed_services.left.erase(g);
                 }
 
-                BOOST_LOG_TRIVIAL(info) << "Zeroconf: service successfully established [" << service.name << "][" << service.type << "][" << service.port << "]";
+                BOOST_LOG_TRIVIAL(info) << "Zeroconf: service successfully established [" << service.name << "]["
+                                        << service.type << "][" << service.port << "]";
                 break;
             }
-            case AVAHI_ENTRY_GROUP_COLLISION:
-            {
+            case AVAHI_ENTRY_GROUP_COLLISION: {
                 /* A service name collision with a 'remote' service happened. Let's pick a new name */
                 ZeroconfService service;
                 {
                     boost::mutex::scoped_lock lock(zeroconf->service_mutex);
                     service_bimap::left_const_iterator left = zeroconf->committed_services.left.find(g);
-                    if (left != zeroconf->committed_services.left.end())
-                    {
+                    if (left != zeroconf->committed_services.left.end()) {
                         service = left->second;
-                    }
-                    else
-                    {
+                    } else {
 
-                        BOOST_LOG_TRIVIAL(fatal) <<"Zeroconf : should never reach here, please report a bug in zeroconf_avahi's entry_group_callback.";
+                        BOOST_LOG_TRIVIAL(fatal)
+                            << "Zeroconf : should never reach here, please report a bug in zeroconf_avahi's entry_group_callback.";
                         return;
                     }
                     zeroconf->committed_services.left.erase(g);
                 }
                 std::string alternative_name = avahi_alternative_service_name(service.name.c_str());
                 BOOST_LOG_TRIVIAL(error) <<
-                "Zeroconf: service name collision, renaming service [" << service.name << "]" << "][" << alternative_name << "]";
+                                         "Zeroconf: service name collision, renaming service [" << service.name << "]"
+                                         << "][" << alternative_name << "]";
                 service.name = alternative_name;
                 avahi_entry_group_free(g);
                 /* And recreate the services - already in the poll thread, so don' tneed to lock. */
@@ -196,41 +180,37 @@ namespace zeroconf {
                 /* Some kind of failure happened while we were registering our services */
                 // drop our committed_service here.
                 BOOST_LOG_TRIVIAL(fatal) <<
-                "Zeroconf: group state changed, system failure when trying to register service [" << avahi_strerror(avahi_client_errno(avahi_entry_group_get_client(g))) << "]";
+                                         "Zeroconf: group state changed, system failure when trying to register service ["
+                                         << avahi_strerror(avahi_client_errno(avahi_entry_group_get_client(g))) << "]";
                 avahi_entry_group_free(g);
                 zeroconf->fail();
                 break;
 
-            case AVAHI_ENTRY_GROUP_UNCOMMITED:
-            {
+            case AVAHI_ENTRY_GROUP_UNCOMMITED: {
                 BOOST_LOG_TRIVIAL(info) << "Zeroconf: group state changed, service uncommitted";
                 // This is just mid-process, no need to handle committed_services
                 break;
             }
-            case AVAHI_ENTRY_GROUP_REGISTERING:
-            {
+            case AVAHI_ENTRY_GROUP_REGISTERING: {
                 // This is just mid-process, no need to handle committed_services
                 ZeroconfService service;
                 {
                     boost::mutex::scoped_lock lock(zeroconf->service_mutex);
                     service_bimap::left_const_iterator left = zeroconf->committed_services.left.find(g);
-                    if (left != zeroconf->committed_services.left.end())
-                    {
+                    if (left != zeroconf->committed_services.left.end()) {
                         service = left->second;
-                    }
-                    else
-                    {
+                    } else {
                         BOOST_LOG_TRIVIAL(fatal) <<
-                        "Zeroconf : should never reach here, please report a bug in zeroconf_avahi's entry_group_callback.";
+                                                 "Zeroconf : should never reach here, please report a bug in zeroconf_avahi's entry_group_callback.";
                         return;
                     }
                 }
                 BOOST_LOG_TRIVIAL(info) <<
-                "Zeroconf: group state changed, service registering [" << service.name << "][" << service.type << "]";
+                                        "Zeroconf: group state changed, service registering [" << service.name << "]["
+                                        << service.type << "]";
                 break;
             }
-            default:
-            {
+            default: {
                 BOOST_LOG_TRIVIAL(info) << "Zeroconf: group state changed, ended in an unknown state [" << state << "]";
                 break;
             }
@@ -240,38 +220,34 @@ namespace zeroconf {
 
     void Zeroconf::client_callback(AvahiClient *c, AvahiClientState state, void *userdata) {
 
-        Zeroconf *zeroconf = static_cast<Zeroconf*>(userdata);
+        Zeroconf *zeroconf = static_cast<Zeroconf *>(userdata);
         assert(c);
 
         /* Called whenever the client or server state changes */
 
-        switch (state)
-        {
-            case AVAHI_CLIENT_S_RUNNING:
-            {
+        switch (state) {
+            case AVAHI_CLIENT_S_RUNNING: {
                 /* The server has startup successfully and registered its host
                  * name on the network, so it's time to fire up */
                 BOOST_LOG_TRIVIAL(info) << "Zeroconf: avahi client up and running.";
                 zeroconf->spin();
                 break;
             }
-            case AVAHI_CLIENT_FAILURE:
-            {
-                BOOST_LOG_TRIVIAL(fatal) << "Zeroconf: avahi client failure [" << avahi_strerror(avahi_client_errno(c)) << "]";
+            case AVAHI_CLIENT_FAILURE: {
+                BOOST_LOG_TRIVIAL(fatal) << "Zeroconf: avahi client failure [" << avahi_strerror(avahi_client_errno(c))
+                                         << "]";
                 zeroconf->fail();
 
                 break;
             }
-            case AVAHI_CLIENT_S_COLLISION:
-            {
+            case AVAHI_CLIENT_S_COLLISION: {
                 BOOST_LOG_TRIVIAL(error) << "Zeroconf: avahi client collision.";
                 /* Let's drop our registered services. When the server is back
                  * in AVAHI_SERVER_RUNNING state we will register them
                  * again with the new host name. */
                 break;
             }
-            case AVAHI_CLIENT_S_REGISTERING:
-            {
+            case AVAHI_CLIENT_S_REGISTERING: {
                 BOOST_LOG_TRIVIAL(info) << "Zeroconf: avahi client registering.";
 
                 /* The server records are now being established. This
@@ -284,8 +260,7 @@ namespace zeroconf {
                 // complicated - ToDo
                 break;
             }
-            case AVAHI_CLIENT_CONNECTING:
-            {
+            case AVAHI_CLIENT_CONNECTING: {
                 BOOST_LOG_TRIVIAL(info) << "Zeroconf: avahi client connecting.";
                 break;
             }
@@ -296,58 +271,57 @@ namespace zeroconf {
     void Zeroconf::discovery_callback(AvahiServiceBrowser *b, AvahiIfIndex interface, AvahiProtocol protocol,
                                       AvahiBrowserEvent event, const char *name, const char *type,
                                       const char *domain, AvahiLookupResultFlags flags, void *userdata) {
-        Zeroconf *zeroconf = reinterpret_cast<Zeroconf*>(userdata);
+        Zeroconf *zeroconf = reinterpret_cast<Zeroconf *>(userdata);
 
-        switch (event)
-        {
+        switch (event) {
             case AVAHI_BROWSER_FAILURE:
                 BOOST_LOG_TRIVIAL(fatal) <<
-                "Zeroconf: browser failure [" << avahi_strerror(avahi_client_errno(avahi_service_browser_get_client(b)));
+                                         "Zeroconf: browser failure ["
+                                         << avahi_strerror(avahi_client_errno(avahi_service_browser_get_client(b)));
                 avahi_threaded_poll_quit(zeroconf->threaded_poll);
                 return;
 
-            case AVAHI_BROWSER_NEW:
-            {
+            case AVAHI_BROWSER_NEW: {
                 ZeroconfService service;
                 service.name = name;
                 service.type = type;
                 service.domain = domain;
 
-                AvahiServiceResolver* resolver = avahi_service_resolver_new(zeroconf->client, interface, protocol, name, type,
+                AvahiServiceResolver *resolver = avahi_service_resolver_new(zeroconf->client, interface, protocol, name,
+                                                                            type,
                                                                             domain, zeroconf->permitted_protocols,
                                                                             static_cast<AvahiLookupFlags>(0),
                                                                             Zeroconf::resolve_callback, zeroconf);
-                if (!resolver)
-                {
+                if (!resolver) {
                     BOOST_LOG_TRIVIAL(fatal) <<
-                    "Zeroconf: avahi resolver failure (avahi daemon problem) [" << name << "][" << avahi_strerror(avahi_client_errno(zeroconf->client)) << "][" << interface << "][" << (protocol) << "]";
+                                             "Zeroconf: avahi resolver failure (avahi daemon problem) [" << name << "]["
+                                             << avahi_strerror(avahi_client_errno(zeroconf->client)) << "]["
+                                             << interface << "][" << (protocol) << "]";
                     break;
                 }
                 {
                     boost::mutex::scoped_lock lock(zeroconf->service_mutex);
                     boost::shared_ptr<DiscoveredZeroconfService> new_service(
-                            new DiscoveredZeroconfService(service, resolver, interface, zeroconf->avahiToInetProtocol(protocol)));
-                    if ((zeroconf->discovered_services.insert(new_service)).second)
-                    {
+                            new DiscoveredZeroconfService(service, resolver, interface,
+                                                          zeroconf->avahiToInetProtocol(protocol)));
+                    if ((zeroconf->discovered_services.insert(new_service)).second) {
                         BOOST_LOG_TRIVIAL(info) <<
-                        "Zeroconf: discovered new service [" << name << "][" << type << "][" << domain << "][" << interface << "][" << protocol << "]" ;
+                                                "Zeroconf: discovered new service [" << name << "][" << type << "]["
+                                                << domain << "][" << interface << "][" << protocol << "]";
                         // we signal in the resolver, not here...though this might be a bad design
                         // decision if the connection is up and down alot.
                         // if ( zeroconf->new_connection_signal ) {
                         //     zeroconf->new_connection_signal(service);
                         // }
-                    }
-                    else
-                    {
+                    } else {
                         BOOST_LOG_TRIVIAL(fatal) <<
-                        "Tried to insert a new service on top of an old stored one - probably a bug in zeroconf_avahi!";
+                                                 "Tried to insert a new service on top of an old stored one - probably a bug in zeroconf_avahi!";
                     }
                 }
                 break;
             }
 
-            case AVAHI_BROWSER_REMOVE:
-            {
+            case AVAHI_BROWSER_REMOVE: {
                 ZeroconfService service;
                 service.name = name;
                 service.type = type;
@@ -355,8 +329,7 @@ namespace zeroconf {
                 {
                     boost::mutex::scoped_lock lock(zeroconf->service_mutex);
                     discovered_service_set::iterator iter = zeroconf->findDiscoveredService(service);
-                    if (iter != zeroconf->discovered_services.end())
-                    {
+                    if (iter != zeroconf->discovered_services.end()) {
                         /*********************
                          ** Update
                          **********************/
@@ -365,34 +338,29 @@ namespace zeroconf {
                          ** Logging
                          **********************/
                         BOOST_LOG_TRIVIAL(info) <<
-                        "Zeroconf: service was removed [" << service.name << "][" << service.type << "][" << service.domain << "][" << interface << "][" << protocol << "]";
+                                                "Zeroconf: service was removed [" << service.name << "]["
+                                                << service.type << "][" << service.domain << "][" << interface << "]["
+                                                << protocol << "]";
                         /*********************
                          ** Signal
                          **********************/
                         // we signal here...though this might get muddled if the connection is up/down alot
                         // I haven't road tested this much yet at all.
-                        if (zeroconf->lost_connection_signal)
-                        {
+                        if (zeroconf->lost_connection_signal) {
                             zeroconf->lost_connection_signal(service);
                         }
-                    }
-                    else
-                    {
+                    } else {
                         BOOST_LOG_TRIVIAL(fatal) <<
-                        "Zeroconf: attempted to remove a non-discovered service (probably a bug in zeroconf_avahi!)";
+                                                 "Zeroconf: attempted to remove a non-discovered service (probably a bug in zeroconf_avahi!)";
                     }
                 }
                 break;
             }
             case AVAHI_BROWSER_ALL_FOR_NOW:
-            case AVAHI_BROWSER_CACHE_EXHAUSTED:
-            {
-                if (event == AVAHI_BROWSER_CACHE_EXHAUSTED)
-                {
+            case AVAHI_BROWSER_CACHE_EXHAUSTED: {
+                if (event == AVAHI_BROWSER_CACHE_EXHAUSTED) {
                     BOOST_LOG_TRIVIAL(info) << "Zeroconf: browser event occured [cache exhausted]" << std::endl;
-                }
-                else
-                {
+                } else {
                     BOOST_LOG_TRIVIAL(info) << "Zeroconf: browser event occured [all for now]" << std::endl;
                 }
                 break;
@@ -408,12 +376,10 @@ namespace zeroconf {
                                     uint16_t port, AvahiStringList *txt, AvahiLookupResultFlags flags,
                                     void *userdata) {
 
-        Zeroconf *zeroconf = reinterpret_cast<Zeroconf*>(userdata);
+        Zeroconf *zeroconf = reinterpret_cast<Zeroconf *>(userdata);
 
-        switch (event)
-        {
-            case AVAHI_RESOLVER_FAILURE:
-            {
+        switch (event) {
+            case AVAHI_RESOLVER_FAILURE: {
                 ZeroconfService service;
                 service.name = name;
                 service.type = type;
@@ -421,25 +387,26 @@ namespace zeroconf {
                 {
                     boost::mutex::scoped_lock lock(zeroconf->service_mutex);
                     discovered_service_set::iterator iter = zeroconf->findDiscoveredService(service);
-                    if (iter != zeroconf->discovered_services.end())
-                    {
+                    if (iter != zeroconf->discovered_services.end()) {
                         /*********************
                          ** Logging
                          **********************/
-                        if ((*iter)->service.ipv4_addresses.size() != 0)
-                        {
+                        if ((*iter)->service.ipv4_addresses.size() != 0) {
                             BOOST_LOG_TRIVIAL(error) <<
-                            "Zeroconf: timed out resolving service [" << name << "][" << type << "][" << domain << "][" << interface << "][" << protocol << "][" << (*iter)->service.ipv4_addresses[0] << ":" << (*iter)->service.port << "]";
-                        }
-                        else if ((*iter)->service.ipv6_addresses.size() != 0)
-                        {
+                                                     "Zeroconf: timed out resolving service [" << name << "][" << type
+                                                     << "][" << domain << "][" << interface << "][" << protocol << "]["
+                                                     << (*iter)->service.ipv4_addresses[0] << ":"
+                                                     << (*iter)->service.port << "]";
+                        } else if ((*iter)->service.ipv6_addresses.size() != 0) {
                             BOOST_LOG_TRIVIAL(error) <<
-                            "Zeroconf: timed out resolving service [" << name << "][" << type << "][" << domain << "][" << interface << "][" << protocol << "][" << (*iter)->service.ipv6_addresses[0] << ":" << (*iter)->service.port << "]";
-                        }
-                        else
-                        {
+                                                     "Zeroconf: timed out resolving service [" << name << "][" << type
+                                                     << "][" << domain << "][" << interface << "][" << protocol << "]["
+                                                     << (*iter)->service.ipv6_addresses[0] << ":"
+                                                     << (*iter)->service.port << "]";
+                        } else {
                             BOOST_LOG_TRIVIAL(error) <<
-                            "Zeroconf: timed out resolving service [" << name << "][" << type << "][" << domain << "][" << interface << "][" << protocol << "]";
+                                                     "Zeroconf: timed out resolving service [" << name << "][" << type
+                                                     << "][" << domain << "][" << interface << "][" << protocol << "]";
                         }
                         /*********************
                          ** Update
@@ -452,21 +419,17 @@ namespace zeroconf {
                         /*********************
                          ** Signals
                          **********************/
-                        if (zeroconf->lost_connection_signal)
-                        {
+                        if (zeroconf->lost_connection_signal) {
                             zeroconf->lost_connection_signal(service);
                         }
-                    }
-                    else
-                    {
+                    } else {
                         BOOST_LOG_TRIVIAL(error) <<
-                        "Zeroconf: timed out resolving a service that was not saved, probably a zeroconf_avahi bug!";
+                                                 "Zeroconf: timed out resolving a service that was not saved, probably a zeroconf_avahi bug!";
                     }
                 }
                 break;
             }
-            case AVAHI_RESOLVER_FOUND:
-            {
+            case AVAHI_RESOLVER_FOUND: {
                 char a[AVAHI_ADDRESS_STR_MAX], *t;
 
                 // workaround for avahi bug 1) above
@@ -480,25 +443,21 @@ namespace zeroconf {
                 service.type = type;
                 service.domain = domain;
                 bool error = false;
-                switch (protocol)
-                {
-                    case (AVAHI_PROTO_INET):
-                    {
+                switch (protocol) {
+                    case (AVAHI_PROTO_INET): {
                         service.ipv4_addresses.push_back(a);
                         // workaround for avahi bug 2) above
                         size_t found = std::string(a).find(":");
-                        if (found != std::string::npos)
-                        {
+                        if (found != std::string::npos) {
                             BOOST_LOG_TRIVIAL(fatal) <<
-                            "Zeroconf: avahi is behaving badly (bug) - set an ipv6 address for an ipv4 service, recovering...";
+                                                     "Zeroconf: avahi is behaving badly (bug) - set an ipv6 address for an ipv4 service, recovering...";
                             avahi_free(t);
                             error = true;
                             break;
                         }
                         break;
                     }
-                    case (AVAHI_PROTO_INET6):
-                    {
+                    case (AVAHI_PROTO_INET6): {
                         service.ipv6_addresses.push_back(a);
                         break;
                     }
@@ -506,8 +465,7 @@ namespace zeroconf {
                         BOOST_LOG_TRIVIAL(fatal) << "Some fatal error during resolve!!!";
                         break; // should never get here
                 }
-                if (error)
-                {
+                if (error) {
                     break;
                 }
 
@@ -523,8 +481,7 @@ namespace zeroconf {
                 {
                     boost::mutex::scoped_lock lock(zeroconf->service_mutex);
                     discovered_service_set::iterator iter = zeroconf->findDiscoveredService(service);
-                    if (iter != zeroconf->discovered_services.end())
-                    {
+                    if (iter != zeroconf->discovered_services.end()) {
                         /*********************
                          ** Update service info
                          **********************/
@@ -536,7 +493,9 @@ namespace zeroconf {
                          ** Logging
                          **********************/
                         BOOST_LOG_TRIVIAL(info) <<
-                        "Zeroconf: resolved service [" << name << "][" << type << "][" << domain << "][" << interface << "][" << ((*iter)->protocol) << "][" << a << ":" << service.port << "]";
+                                                "Zeroconf: resolved service [" << name << "][" << type << "][" << domain
+                                                << "][" << interface << "][" << ((*iter)->protocol) << "][" << a << ":"
+                                                << service.port << "]";
                         BOOST_LOG_TRIVIAL(info) << "Zeroconf: \tname: " << service.name;
                         BOOST_LOG_TRIVIAL(info) << "Zeroconf: \ttype: " << service.type;
                         BOOST_LOG_TRIVIAL(info) << "Zeroconf: \tdomain: " << service.domain;
@@ -547,22 +506,19 @@ namespace zeroconf {
                         BOOST_LOG_TRIVIAL(info) << "Zeroconf: \tport: " << service.port;
                         BOOST_LOG_TRIVIAL(info) << "Zeroconf: \tdescription: " << service.description;
                         BOOST_LOG_TRIVIAL(info) << "Zeroconf: \tcookie: " << service.cookie;
-                        BOOST_LOG_TRIVIAL(info) << "Zeroconf: \tis_local: " << (service.is_local ? 1 : 0 ) ;
-                        BOOST_LOG_TRIVIAL(info) << "Zeroconf: \tour_own: " << (service.our_own ? 1 : 0 );
-                        BOOST_LOG_TRIVIAL(info) << "Zeroconf: \twide_area: " << (service.wide_area ? 1 : 0 );
-                        BOOST_LOG_TRIVIAL(info) << "Zeroconf: \tmulticast: " << (service.multicast ? 1 : 0 );
+                        BOOST_LOG_TRIVIAL(info) << "Zeroconf: \tis_local: " << (service.is_local ? 1 : 0);
+                        BOOST_LOG_TRIVIAL(info) << "Zeroconf: \tour_own: " << (service.our_own ? 1 : 0);
+                        BOOST_LOG_TRIVIAL(info) << "Zeroconf: \twide_area: " << (service.wide_area ? 1 : 0);
+                        BOOST_LOG_TRIVIAL(info) << "Zeroconf: \tmulticast: " << (service.multicast ? 1 : 0);
                         /*********************
                          ** Signals
                          **********************/
-                        if (zeroconf->new_connection_signal)
-                        {
+                        if (zeroconf->new_connection_signal) {
                             zeroconf->new_connection_signal(service);
                         }
-                    }
-                    else
-                    {
+                    } else {
                         BOOST_LOG_TRIVIAL(fatal) <<
-                        "Zeroconf: timed out resolving a service that was not saved, probably a zeroconf_avahi bug!";
+                                                 "Zeroconf: timed out resolving a service that was not saved, probably a zeroconf_avahi bug!";
                     }
                 }
 
@@ -579,51 +535,45 @@ namespace zeroconf {
     }
 
     Zeroconf::Zeroconf() : invalid_object(false), threaded_poll(NULL), client(NULL), interface(AVAHI_IF_UNSPEC),
-                           permitted_protocols(AVAHI_PROTO_INET){
+                           permitted_protocols(AVAHI_PROTO_INET) {
 
         int error;
-        if(!(threaded_poll=avahi_threaded_poll_new()))
-        {
+        if (!(threaded_poll = avahi_threaded_poll_new())) {
             //LOG ERROR
             invalid_object = true;
-            return ;
+            return;
         }
-        client = avahi_client_new(avahi_threaded_poll_get(threaded_poll), static_cast<AvahiClientFlags>(0),Zeroconf::client_callback,this,&error);
-        if(!client)
-        {
+        client = avahi_client_new(avahi_threaded_poll_get(threaded_poll), static_cast<AvahiClientFlags>(0),
+                                  Zeroconf::client_callback, this, &error);
+        if (!client) {
             //LOG ERROR
-            invalid_object =true;
+            invalid_object = true;
             return;
         }
     }
 
     Zeroconf::~Zeroconf() {
         boost::mutex::scoped_lock(service_mutex);
-        for(discovery_bimap::left_const_iterator iter=discovery_service_types.left.begin();
-            iter != discovery_service_types.left.end();++iter)
-        {
+        for (discovery_bimap::left_const_iterator iter = discovery_service_types.left.begin();
+             iter != discovery_service_types.left.end(); ++iter) {
             avahi_service_browser_free(iter->first);
         }
         discovered_services.clear();
         discovery_service_types.clear();
-        if(threaded_poll)
-        {
+        if (threaded_poll) {
             avahi_threaded_poll_stop(threaded_poll);
         }
-        if(client)
-        {
+        if (client) {
             avahi_client_free(client);
         }
-        if(threaded_poll)
-        {
+        if (threaded_poll) {
             avahi_threaded_poll_free(threaded_poll);
         }
     }
 
     void Zeroconf::spin() {
 
-        if(!invalid_object)
-        {
+        if (!invalid_object) {
             //TODO: Write to log
             BOOST_LOG_TRIVIAL(info) << "Starting Zeroconf";
 
@@ -634,59 +584,47 @@ namespace zeroconf {
     void Zeroconf::listDiscoveredServices(const std::string &service_type, std::vector<ZeroconfService> &list) {
         list.clear();
         boost::mutex::scoped_lock lock(service_mutex);
-        if (service_type == "")
-        {
-            for (discovered_service_set::iterator iter = discovered_services.begin(); iter != discovered_services.end(); ++iter)
-            {
+        if (service_type == "") {
+            for (discovered_service_set::iterator iter = discovered_services.begin();
+                 iter != discovered_services.end(); ++iter) {
                 // ignore services that aren't currently resolved
-                if (((*iter)->service.ipv4_addresses.size() != 0) || ((*iter)->service.ipv6_addresses.size() != 0))
-                {
+                if (((*iter)->service.ipv4_addresses.size() != 0) || ((*iter)->service.ipv6_addresses.size() != 0)) {
                     list.push_back((*iter)->service);
                 }
             }
-        }
-        else
-        {
-            for (discovered_service_set::iterator iter = discovered_services.begin(); iter != discovered_services.end(); ++iter)
-            {
-                if ((*iter)->service.type == service_type)
-                {
+        } else {
+            for (discovered_service_set::iterator iter = discovered_services.begin();
+                 iter != discovered_services.end(); ++iter) {
+                if ((*iter)->service.type == service_type) {
                     // ignore services that aren't currently resolved
-                    if (((*iter)->service.ipv4_addresses.size() != 0) || ((*iter)->service.ipv6_addresses.size() != 0))
-                    {
+                    if (((*iter)->service.ipv4_addresses.size() != 0) ||
+                        ((*iter)->service.ipv6_addresses.size() != 0)) {
                         list.push_back((*iter)->service);
                     }
                 }
             }
         }
     }
+
     void Zeroconf::listPublishedServices(const std::string &service_type,
-                                         std::vector<ZeroconfService> &list)
-    {
+                                         std::vector<ZeroconfService> &list) {
         list.clear();
         boost::mutex::scoped_lock lock(service_mutex);
-        if (service_type == "")
-        {
+        if (service_type == "") {
             for (service_bimap::left_const_iterator iter = established_services.left.begin();
-                 iter != established_services.left.end(); ++iter)
-            {
+                 iter != established_services.left.end(); ++iter) {
                 list.push_back(iter->second);
             }
-        }
-        else
-        {
+        } else {
             for (service_bimap::left_const_iterator iter = established_services.left.begin();
-                 iter != established_services.left.end(); ++iter)
-            {
-                if (iter->second.type == service_type)
-                {
+                 iter != established_services.left.end(); ++iter) {
+                if (iter->second.type == service_type) {
                     list.push_back(iter->second);
                 }
             }
         }
 
     }
-
 
 
     bool Zeroconf::addServiceNonThreaded(ZeroconfService service) {
@@ -744,8 +682,7 @@ namespace zeroconf {
                 //TODO: Write to log
                 BOOST_LOG_TRIVIAL(error) << "Collison names";
                 return addServiceNonThreaded(service);
-            }
-            else {
+            } else {
                 BOOST_LOG_TRIVIAL(fatal) << "Very bad error durin adding service";
                 //TODO: Write to log
                 fail();
@@ -756,8 +693,7 @@ namespace zeroconf {
             boost::mutex::scoped_lock lock(service_mutex);
             committed_services.insert(service_bimap::value_type(group, service)); // should check the return value...
         }
-        if ((ret = avahi_entry_group_commit(group)) < 0)
-        {
+        if ((ret = avahi_entry_group_commit(group)) < 0) {
             BOOST_LOG_TRIVIAL(error) << "Zeroconf: failed to commit entry group [" << avahi_strerror(ret) << "]";
             avahi_entry_group_free(group);
             {
@@ -770,18 +706,14 @@ namespace zeroconf {
         BOOST_LOG_TRIVIAL(info) << "Zeroconf: service committed, waiting for callback...";
         return true;
     }
-    Zeroconf::discovered_service_set::iterator Zeroconf::findDiscoveredService(ZeroconfService &service)
-    {
+
+    Zeroconf::discovered_service_set::iterator Zeroconf::findDiscoveredService(ZeroconfService &service) {
         discovered_service_set::iterator iter = discovered_services.begin();
-        while (iter != discovered_services.end())
-        {
+        while (iter != discovered_services.end()) {
             if (((*iter)->service.name == service.name) && ((*iter)->service.type == service.type)
-                && ((*iter)->service.domain == service.domain))
-            {
+                && ((*iter)->service.domain == service.domain)) {
                 return iter;
-            }
-            else
-            {
+            } else {
                 ++iter;
             }
         }
@@ -789,8 +721,7 @@ namespace zeroconf {
     }
 
     int Zeroconf::avahiToInetProtocol(const int &protocol) {
-        switch (protocol)
-        {
+        switch (protocol) {
             case AVAHI_PROTO_INET:
                 return AF_INET;
                 break;

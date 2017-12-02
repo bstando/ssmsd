@@ -14,8 +14,8 @@ set(CMAKE_CXX_FLAGS " -std=c++11")
 
 add_executable(ssmsd
     server.cpp
-        DataExchangeServer.cpp DataExchangeServer.hpp
-        db_helper.cpp db_helper.hpp
-        sensor.cpp sensor.hpp Zeroconf.cpp Zeroconf.hpp)
+        AppConnector.cpp AppConnector.hpp
+        DBHelper.cpp DBHelper.hpp
+        SensorData.cpp SensorData.hpp Zeroconf.cpp Zeroconf.hpp SensorConnector.cpp SensorConnector.hpp ServerHelper.cpp ServerHelper.hpp)
 
 target_link_libraries(ssmsd sqlite3 avahi-client avahi-common pthread ${Boost_LIBRARIES})

@@ -7,9 +7,9 @@
 #include <string>
 #include "sqlite_modern_cpp.h"
 #include <boost/thread/mutex.hpp>
-#include "sensor.hpp"
+#include "SensorData.hpp"
 
-using namespace  sqlite;
+using namespace sqlite;
 using namespace std;
 class DBHelper {
 	private:

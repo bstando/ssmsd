@@ -2,8 +2,8 @@
 // Created by bartosz on 06.06.16.
 //
 
-#ifndef SERVER_DATAEXCHANGESERVER_HPP
-#define SERVER_DATAEXCHANGESERVER_HPP
+#ifndef SERVER_REQUESTSLISTENER_HPP
+#define SERVER_REQUESTSLISTENER_HPP
 
 #include <string>
 
@@ -19,11 +19,11 @@
 #include <cstring>
 #include <vector>
 #include <string>
-#include "db_helper.hpp"
+#include "DBHelper.hpp"
 #include <ArduinoJson.h>
 
 
-class DataExchangeServer {
+class AppConnector {
 private:
 
     static const int BUF_SIZE = 500;
@@ -38,11 +38,11 @@ private:
 
 public:
     const char *port = "9873";
-    void startListening();
-    //DataExchangeServer();
-    DataExchangeServer(const string &filename);
-    ~DataExchangeServer();
+    void StartListening();
+    //AppConnector();
+    AppConnector(const string &filename);
+    ~AppConnector();
 };
 
 
-#endif //SERVER_DATAEXCHANGESERVER_HPP
+#endif //SERVER_REQUESTSLISTENER_HPP

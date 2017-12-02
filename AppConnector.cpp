@@ -4,10 +4,10 @@
 
 #include <thread>
 #include <boost/log/trivial.hpp>
-#include "DataExchangeServer.hpp"
+#include "AppConnector.hpp"
 
 using namespace std;
-vector<std::string> DataExchangeServer::prepareAllDataResponse() {
+vector<std::string> AppConnector::prepareAllDataResponse() {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
     vector<SensorData> sensorData = helper->getAllData();
@@ -55,14 +55,14 @@ vector<std::string> DataExchangeServer::prepareAllDataResponse() {
     return retval;
 }
 
-void DataExchangeServer::startListening() {
+void AppConnector::StartListening() {
     struct addrinfo hints;
     struct addrinfo *result, *rp;
     int sfd, s;
     struct sockaddr_storage peer_addr;
     socklen_t peer_addr_len;
     ssize_t nread;
-    char buf[DataExchangeServer::BUF_SIZE];
+    char buf[AppConnector::BUF_SIZE];
 
 
     memset(&hints, 0, sizeof(struct addrinfo));
@@ -180,15 +180,15 @@ void DataExchangeServer::startListening() {
     }
 }
 
-/*DataExchangeServer::DataExchangeServer() {
+/*AppConnector::AppConnector() {
     helper = new DBHelper();
 }*/
 
-DataExchangeServer::~DataExchangeServer() {
+AppConnector::~AppConnector() {
     delete helper;
 }
 
-vector<std::string> DataExchangeServer::prepareByDateResponse(std::string date) {
+vector<std::string> AppConnector::prepareByDateResponse(std::string date) {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
     vector<SensorData> sensorData = helper->getByDate(date);
@@ -237,7 +237,7 @@ vector<std::string> DataExchangeServer::prepareByDateResponse(std::string date) 
 
 
 
-vector<std::string> DataExchangeServer::prepareDataResponse(int limit) {
+vector<std::string> AppConnector::prepareDataResponse(int limit) {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
     vector<SensorData> sensorData = helper->getLastData(limit);
@@ -283,7 +283,7 @@ vector<std::string> DataExchangeServer::prepareDataResponse(int limit) {
     return retval;
 }
 
-vector<std::string> DataExchangeServer::prepareBySensorIDResponse(int sensorID) {
+vector<std::string> AppConnector::prepareBySensorIDResponse(int sensorID) {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
     vector<SensorData> sensorData = helper->getBySensorID(sensorID);
@@ -329,7 +329,7 @@ vector<std::string> DataExchangeServer::prepareBySensorIDResponse(int sensorID) 
     return retval;
 }
 
-vector<std::string> DataExchangeServer::prepareEmptyResponse() {
+vector<std::string> AppConnector::prepareEmptyResponse() {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
     JsonObject &response = jsonBuffer.createObject();
@@ -342,7 +342,7 @@ vector<std::string> DataExchangeServer::prepareEmptyResponse() {
     return retval;
 }
 
-vector<std::string> DataExchangeServer::prepareSensorIDsResponse() {
+vector<std::string> AppConnector::prepareSensorIDsResponse() {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
     vector<int> sensorData = helper->getSensorIDs();
@@ -385,7 +385,7 @@ vector<std::string> DataExchangeServer::prepareSensorIDsResponse() {
     return retval;
 }
 
-DataExchangeServer::DataExchangeServer(const string &filename) {
+AppConnector::AppConnector(const string &filename) {
     helper = new DBHelper(filename);
 }
 
