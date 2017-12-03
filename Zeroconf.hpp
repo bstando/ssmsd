@@ -169,21 +169,21 @@ namespace zeroconf {
     public:
         Zeroconf();
         ~Zeroconf();
-        bool addService(ZeroconfService service);
-        bool addListener(const std::string &type);
-        bool removeService(const ZeroconfService &service);
-        bool removeListener(const std::string &type);
-        bool isAlive() const { return !invalid_object;}
-        void listDiscoveredServices(const std::string &service_type, std::vector<ZeroconfService> &list);
-        void listPublishedServices(const std::string &service_type, std::vector<ZeroconfService> &list);
+        bool AddService(ZeroconfService service);
+        bool AddListener(const std::string &type);
+        bool RemoveService(const ZeroconfService &service);
+        bool RemoveListener(const std::string &type);
+        bool IsAlive() const { return !invalid_object;}
+        void ListDiscoveredServices(const std::string &service_type, std::vector<ZeroconfService> &list);
+        void ListPublishedServices(const std::string &service_type, std::vector<ZeroconfService> &list);
 
-        void connect_signal_callbacks(connection_signal_cb new_connections, connection_signal_cb lost_connections)
+        void Connect_signal_callbacks(connection_signal_cb new_connections, connection_signal_cb lost_connections)
         {
             new_connection_signal = new_connections;
             lost_connection_signal = lost_connections;
         }
 
-        void spin();
+        void Spin();
     };
 }
 

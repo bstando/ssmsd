@@ -18,6 +18,7 @@ using namespace zeroconf;
 
 class SensorConnector {
 private:
+    bool shouldWork;
     std::string dbFile;
     void SaveToDatabase(SensorData data);
     SensorData DownloadData(const char *host, int port);
@@ -27,6 +28,7 @@ private:
 public:
     SensorConnector(ZeroconfService service, int interval, std::string dbFile);
     void StartCollecting();
+    void StopCollecting();
 };
 
 

@@ -11,7 +11,7 @@
 
 
 SensorConnector::SensorConnector(ZeroconfService service, int interval ,std::string dbFile) {
-    this->zeroconf.addService(service);
+    this->zeroconf.AddService(service);
     this->interval = interval;
     this->dbFile = dbFile;
     dbHelper = new DBHelper(dbFile);
@@ -126,11 +126,12 @@ void SensorConnector::SaveToDatabase(SensorData data) {
 }
 
 void SensorConnector::StartCollecting() {
-    zeroconf.addListener("_json._udp");
+    zeroconf.AddListener("_json._udp");
+    shouldWork = true;
     vector<ZeroconfService> devices;
-    while (true) {
+    while (shouldWork) {
         BOOST_LOG_TRIVIAL(info) << "Looking for devices to collect data";
-        zeroconf.listDiscoveredServices("", devices);
+        zeroconf.ListDiscoveredServices("", devices);
         for (ZeroconfService device : devices) {
             //cout << "Get data from: " << device.ipv4_addresses.at(0).c_str() << ", " << device.port << endl;
             BOOST_LOG_TRIVIAL(info) << "Get data from: " << device.ipv4_addresses.at(0).c_str() << ", " << device.port;
@@ -140,7 +141,7 @@ void SensorConnector::StartCollecting() {
             BOOST_LOG_TRIVIAL(info) << "Added new data from: " << device.ipv4_addresses.at(0).c_str() << ", " <<
                                     device.port;
         }
-        if (devices.size() > 0) {
+        if (!devices.empty()) {
             //cout << "Saving done. Sleep for " << period << endl;
             BOOST_LOG_TRIVIAL(info) << "Saving done. Sleep for " << interval << " seconds";
             boost::this_thread::sleep_for(boost::chrono::seconds(interval));
@@ -150,5 +151,9 @@ void SensorConnector::StartCollecting() {
             boost::this_thread::sleep_for(boost::chrono::seconds(10));
         }
     }
+}
+
+void SensorConnector::StopCollecting() {
+    shouldWork = false;
 }
 

@@ -14,14 +14,14 @@
 #include <boost/log/trivial.hpp>
 
 namespace zeroconf {
-    bool Zeroconf::addService(zeroconf::ZeroconfService service) {
+    bool Zeroconf::AddService(zeroconf::ZeroconfService service) {
         avahi_threaded_poll_lock(threaded_poll);
         bool result = addServiceNonThreaded(service);
         avahi_threaded_poll_unlock(threaded_poll);
         return result;
     }
 
-    bool Zeroconf::addListener(const std::string &type) {
+    bool Zeroconf::AddListener(const std::string &type) {
         if (invalid_object) {
             //TODO: Write to log
             //std::cerr << "Invalid object Error" << std::endl;
@@ -56,7 +56,7 @@ namespace zeroconf {
         return true;
     }
 
-    bool Zeroconf::removeService(const ZeroconfService &service) {
+    bool Zeroconf::RemoveService(const ZeroconfService &service) {
 
         AvahiEntryGroup *group = NULL;
         bool erased = false;
@@ -84,7 +84,7 @@ namespace zeroconf {
         return erased;
     }
 
-    bool Zeroconf::removeListener(const std::string &type) {
+    bool Zeroconf::RemoveListener(const std::string &type) {
         AvahiServiceBrowser *service_browser = NULL;
 
         /* Check if we're already listening for it. */
@@ -230,7 +230,7 @@ namespace zeroconf {
                 /* The server has startup successfully and registered its host
                  * name on the network, so it's time to fire up */
                 BOOST_LOG_TRIVIAL(info) << "Zeroconf: avahi client up and running.";
-                zeroconf->spin();
+                zeroconf->Spin();
                 break;
             }
             case AVAHI_CLIENT_FAILURE: {
@@ -571,7 +571,7 @@ namespace zeroconf {
         }
     }
 
-    void Zeroconf::spin() {
+    void Zeroconf::Spin() {
 
         if (!invalid_object) {
             //TODO: Write to log
@@ -581,7 +581,7 @@ namespace zeroconf {
         }
     }
 
-    void Zeroconf::listDiscoveredServices(const std::string &service_type, std::vector<ZeroconfService> &list) {
+    void Zeroconf::ListDiscoveredServices(const std::string &service_type, std::vector<ZeroconfService> &list) {
         list.clear();
         boost::mutex::scoped_lock lock(service_mutex);
         if (service_type == "") {
@@ -606,7 +606,7 @@ namespace zeroconf {
         }
     }
 
-    void Zeroconf::listPublishedServices(const std::string &service_type,
+    void Zeroconf::ListPublishedServices(const std::string &service_type,
                                          std::vector<ZeroconfService> &list) {
         list.clear();
         boost::mutex::scoped_lock lock(service_mutex);
