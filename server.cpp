@@ -46,9 +46,9 @@ using namespace zeroconf;
 using namespace boost::log::trivial;
 
 
-void StartSensorConnector(ZeroconfService collector, int interval, std::string dbFile)
+void StartSensorConnector(Zeroconf &zeroconf, int interval, std::string dbFile)
 {
-    SensorConnector sc(collector,interval,dbFile);
+    SensorConnector sc(zeroconf,interval,dbFile);
     sc.StartCollecting();
 }
 
@@ -73,8 +73,10 @@ int main(int argc,char *argv[]) {
     collector.port = 9873;
     collector.domain = "local";
 
+    Zeroconf zeroconf;
+    zeroconf.AddService(collector);
 
-    thread scThread(StartSensorConnector,collector,serverHelper.GetInterval(),serverHelper.GetDBFileName());
+    thread scThread(StartSensorConnector,ref(zeroconf),serverHelper.GetInterval(),serverHelper.GetDBFileName());
     sleep(2);
     thread apThread(StartAppConnector,serverHelper.GetDBFileName());
     BOOST_LOG_TRIVIAL(info) << "Server Started";

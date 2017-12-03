@@ -40,7 +40,7 @@ public:
     const char *port = "9873";
     void StartListening();
     //AppConnector();
-    AppConnector(const string &filename);
+    explicit AppConnector(const string &filename);
     ~AppConnector();
 };
 

@@ -10,8 +10,8 @@
 #include <ArduinoJson.h>
 
 
-SensorConnector::SensorConnector(ZeroconfService service, int interval ,std::string dbFile) {
-    this->zeroconf.AddService(service);
+SensorConnector::SensorConnector(Zeroconf &zeroconf, int interval ,std::string dbFile) {
+    this->zeroconf = &zeroconf;
     this->interval = interval;
     this->dbFile = dbFile;
     dbHelper = new DBHelper(dbFile);
@@ -126,12 +126,12 @@ void SensorConnector::SaveToDatabase(SensorData data) {
 }
 
 void SensorConnector::StartCollecting() {
-    zeroconf.AddListener("_json._udp");
+    zeroconf->AddListener("_json._udp");
     shouldWork = true;
     vector<ZeroconfService> devices;
     while (shouldWork) {
         BOOST_LOG_TRIVIAL(info) << "Looking for devices to collect data";
-        zeroconf.ListDiscoveredServices("", devices);
+        zeroconf->ListDiscoveredServices("", devices);
         for (ZeroconfService device : devices) {
             //cout << "Get data from: " << device.ipv4_addresses.at(0).c_str() << ", " << device.port << endl;
             BOOST_LOG_TRIVIAL(info) << "Get data from: " << device.ipv4_addresses.at(0).c_str() << ", " << device.port;

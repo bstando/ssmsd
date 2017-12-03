@@ -22,11 +22,11 @@ private:
     std::string dbFile;
     void SaveToDatabase(SensorData data);
     SensorData DownloadData(const char *host, int port);
-    Zeroconf zeroconf;
+    Zeroconf *zeroconf;
     int interval;
     DBHelper* dbHelper;
 public:
-    SensorConnector(ZeroconfService service, int interval, std::string dbFile);
+    SensorConnector(Zeroconf &zeroconf, int interval, std::string dbFile);
     void StartCollecting();
     void StopCollecting();
 };
