@@ -11,6 +11,7 @@ DBHelper::DBHelper() {
 
 DBHelper::DBHelper(const string &filename) {
     db = new database(filename);
+	InitializeDatabase();
 }
 
 DBHelper::~DBHelper() {
