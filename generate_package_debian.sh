@@ -5,7 +5,6 @@ BUILDDIR=$BASEDIR/build_debian
 PACKAGEDIR=$BASEDIR/debian_package
 DEBIANDIR=$BASEDIR/package_deb
 
-apt install cpack
 
 mkdir -p $PACKAGEDIR
 
