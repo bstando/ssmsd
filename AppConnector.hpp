@@ -29,12 +29,12 @@ private:
     static const int BUF_SIZE = 500;
     DBHelper *helper;
 
-    vector<std::string> prepareAllDataResponse();
-    vector<std::string> prepareDataResponse(int limit);
-    vector<std::string> prepareByDateResponse(std::string date);
-    vector<std::string> prepareBySensorIDResponse(int sensorID);
-    vector<std::string> prepareSensorIDsResponse();
-    vector<std::string> prepareEmptyResponse();
+    vector<std::string> PrepareAllDataResponse();
+    vector<std::string> PrepareDataResponse(int limit);
+    vector<std::string> PrepareByDateResponse(std::string date);
+    vector<std::string> PrepareBySensorIDResponse(int sensorID);
+    vector<std::string> PrepareSensorIDsResponse();
+    vector<std::string> PrepareEmptyResponse();
 
 public:
     const char *port = "9873";

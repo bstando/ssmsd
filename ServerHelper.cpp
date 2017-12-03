@@ -33,8 +33,7 @@ namespace
 }
 
 
-ServerHelper::ServerHelper() {
-}
+ServerHelper::ServerHelper() = default;
 
 void ServerHelper::ShowHelp() {
     std::cout << "Usage: " << appName << " -i interval | -h " << std::endl;

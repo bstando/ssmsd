@@ -3,9 +3,7 @@
 BASEDIR=$PWD
 BUILDDIR=$BASEDIR/build_debian
 
-if [ ! -d "$BUILDDIR" ]; then
-	mkdir $BUILDDIR
-fi
+mkdir -p $BUILDDIR
 
 cd $BUILDDIR
 

@@ -7,7 +7,7 @@
 #include "AppConnector.hpp"
 
 using namespace std;
-vector<std::string> AppConnector::prepareAllDataResponse() {
+vector<std::string> AppConnector::PrepareAllDataResponse() {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
     vector<SensorData> sensorData = helper->GetAllData();
@@ -138,36 +138,36 @@ void AppConnector::StartListening() {
             string dateFrom;
             switch (commandID) {
                 case 0:
-                    response = prepareAllDataResponse();
+                    response = PrepareAllDataResponse();
                     break;
                 case 1:
                     count = command["limit"];
                     if(count!=0)
-                    response = prepareDataResponse(count);
+                    response = PrepareDataResponse(count);
                     break;
                 case 2:
                     //command["date"];
                     //if(dateFrom.length()!=0)
-                    response = prepareByDateResponse( command["date"]);
+                    response = PrepareByDateResponse(command["date"]);
                     break;
                 case 3:
                     sensorID = command["sensorID"];
-                    response = prepareBySensorIDResponse(sensorID);
+                    response = PrepareBySensorIDResponse(sensorID);
                     break;
                 case 4:
-                    response = prepareSensorIDsResponse();
+                    response = PrepareSensorIDsResponse();
                     break;
                 default:
-                    response = prepareEmptyResponse();
+                    response = PrepareEmptyResponse();
                     break;
             }
-            if(response.size()==0) response = prepareEmptyResponse();
+            if(response.size()==0) response = PrepareEmptyResponse();
 
             for (int i = 0; i < response.size(); i++) {
                 int rplen = sendto(sfd, response[i].c_str(), response[i].length(), 0,
                                    (struct sockaddr *) &peer_addr,
                                    peer_addr_len);
-                //prepareAllDataResponse();
+                //PrepareAllDataResponse();
                 if (rplen != response[i].length()) {
                     //fprintf(stderr, "Error sending response\n");
                     BOOST_LOG_TRIVIAL(fatal) << "Error sending response";
@@ -188,7 +188,7 @@ AppConnector::~AppConnector() {
     delete helper;
 }
 
-vector<std::string> AppConnector::prepareByDateResponse(std::string date) {
+vector<std::string> AppConnector::PrepareByDateResponse(std::string date) {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
     vector<SensorData> sensorData = helper->GetByDate(date);
@@ -237,7 +237,7 @@ vector<std::string> AppConnector::prepareByDateResponse(std::string date) {
 
 
 
-vector<std::string> AppConnector::prepareDataResponse(int limit) {
+vector<std::string> AppConnector::PrepareDataResponse(int limit) {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
     vector<SensorData> sensorData = helper->GetLastData(limit);
@@ -283,7 +283,7 @@ vector<std::string> AppConnector::prepareDataResponse(int limit) {
     return retval;
 }
 
-vector<std::string> AppConnector::prepareBySensorIDResponse(int sensorID) {
+vector<std::string> AppConnector::PrepareBySensorIDResponse(int sensorID) {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
     vector<SensorData> sensorData = helper->GetBySensorID(sensorID);
@@ -329,7 +329,7 @@ vector<std::string> AppConnector::prepareBySensorIDResponse(int sensorID) {
     return retval;
 }
 
-vector<std::string> AppConnector::prepareEmptyResponse() {
+vector<std::string> AppConnector::PrepareEmptyResponse() {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
     JsonObject &response = jsonBuffer.createObject();
@@ -342,7 +342,7 @@ vector<std::string> AppConnector::prepareEmptyResponse() {
     return retval;
 }
 
-vector<std::string> AppConnector::prepareSensorIDsResponse() {
+vector<std::string> AppConnector::PrepareSensorIDsResponse() {
     vector<std::string> retval;
     DynamicJsonBuffer jsonBuffer;
     vector<int> sensorData = helper->GetSensorIDs();

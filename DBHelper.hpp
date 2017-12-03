@@ -18,7 +18,7 @@ class DBHelper {
 	
 	public:	
 	//DBHelper();
-	DBHelper(const string& filename);
+	explicit DBHelper(const string& filename);
 	~DBHelper();
 	bool InitializeDatabase();
 	void InsertData(int sensorID, string date, float temperature, float humidity);

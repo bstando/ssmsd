@@ -35,3 +35,7 @@
 build_debian/*
 .idea/*
 cmake-build-debug/*
+debian_package/*
+package_deb/usr/bin/ssmsd
+package_rpm/usr/bin/ssmsd
+feodra_package/*
