@@ -64,7 +64,7 @@ int main(int argc,char *argv[]) {
     serverHelper.ParseArguments(argc,argv);
     serverHelper.InitLog();
     serverHelper.Daemonize();
-
+    BOOST_LOG_TRIVIAL(info) << "Daemon started";
 
 
     ZeroconfService collector;

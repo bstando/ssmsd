@@ -147,6 +147,8 @@ int ServerHelper::GetInterval() {
 }
 
 void ServerHelper::Daemonize() {
+    /*
+    BOOST_LOG_TRIVIAL(info) << "Going to first fork";
     if (pid_t pid = fork()) {
         if (pid > 0) {
             exit(0);
@@ -155,9 +157,12 @@ void ServerHelper::Daemonize() {
             exit(-1);
         }
     }
+    BOOST_LOG_TRIVIAL(info) << "Passed first fork";
+    */
     setsid();
     chdir("/");
     umask(0);
+    BOOST_LOG_TRIVIAL(info) << "setsid, chdir and umask done, going to second fork";
     if (pid_t pid = fork()) {
         if (pid > 0) {
             exit(0);
@@ -166,6 +171,7 @@ void ServerHelper::Daemonize() {
             exit(-1);
         }
     }
+    BOOST_LOG_TRIVIAL(info) << "Passed second fork, closing desriptors";
     close(0);
     close(1);
     close(2);
