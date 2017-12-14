@@ -9,9 +9,22 @@ DBHelper::DBHelper() {
 }
 */
 
-DBHelper::DBHelper(const string &filename) {
-    db = new database(filename);
-	InitializeDatabase();
+DBHelper::DBHelper(string filename) {
+    boost::mutex::scoped_lock lock(database_mutex);
+    try {
+        BOOST_LOG_TRIVIAL(info) << "Initializing DBHelper object";
+        BOOST_LOG_TRIVIAL(info) << filename;
+        sqlite_config config;
+        config.flags = OpenFlags::READWRITE | OpenFlags::CREATE;
+        db = new database(filename,config);
+        lock.unlock();
+        InitializeDatabase();
+        BOOST_LOG_TRIVIAL(info) << "DBHelper object initialized";
+    }
+    catch (exception &e) {
+        BOOST_LOG_TRIVIAL(fatal) << e.what();
+        lock.unlock();
+    }
 }
 
 DBHelper::~DBHelper() {
@@ -19,6 +32,7 @@ DBHelper::~DBHelper() {
 }
 
 bool DBHelper::InitializeDatabase() {
+	BOOST_LOG_TRIVIAL(info) << "Trying to initialize database";
 	boost::mutex::scoped_lock lock(database_mutex);
 	try {
 		*db << "CREATE TABLE IF NOT EXISTS sensor "
@@ -29,6 +43,7 @@ bool DBHelper::InitializeDatabase() {
 				"humidity float"
 				");";
 		lock.unlock();
+		BOOST_LOG_TRIVIAL(info) << "Database initialized";
 		return true;
 	}
 	catch (exception &e) {
@@ -57,6 +72,8 @@ void DBHelper::InsertData(int sensorID, string date, float temperature, float hu
 }
 
 void DBHelper::InsertSensorData(SensorData data) {
+    BOOST_LOG_TRIVIAL(info) << "Trying to insert data to database";
+    BOOST_LOG_TRIVIAL(info) << "SensorID: " << data.getSensorID() << ", date: " << data.getDate() << ", temperature: " << data.getTemperature() << ", humidity: " << data.getHumidity();
 	boost::mutex::scoped_lock lock(database_mutex);
 	try {
 		*db << "INSERT INTO sensor (sensorID, date, temperature,humidity) values (?,?,?,?);"
@@ -65,6 +82,7 @@ void DBHelper::InsertSensorData(SensorData data) {
 			<< data.getTemperature()
 			<< data.getHumidity();
 		lock.unlock();
+        BOOST_LOG_TRIVIAL(info) << "Row added";
 	}
 	catch (exception &e) {
 		lock.unlock();
@@ -73,6 +91,7 @@ void DBHelper::InsertSensorData(SensorData data) {
 }
 
 vector<SensorData> DBHelper::GetAllData() {
+    BOOST_LOG_TRIVIAL(info) << "Trying to get all data from database";
 	vector<SensorData> *retval = new vector<SensorData>();
 	boost::mutex::scoped_lock lock(database_mutex);
 	try {
@@ -87,6 +106,7 @@ vector<SensorData> DBHelper::GetAllData() {
 				retval->push_back(*sensor);
 			};
 		lock.unlock();
+        BOOST_LOG_TRIVIAL(info) << "Got " << retval->size() << " rows from database";
 	}
 	catch (exception &e) {
 		lock.unlock();
@@ -96,6 +116,7 @@ vector<SensorData> DBHelper::GetAllData() {
 }
 
 vector<SensorData> DBHelper::GetLastData(int limit) {
+    BOOST_LOG_TRIVIAL(info) << "Trying to get " << limit << " rows from database";
 	vector<SensorData> *retval = new vector<SensorData>();
 	boost::mutex::scoped_lock lock(database_mutex);
 	try {
@@ -111,6 +132,7 @@ vector<SensorData> DBHelper::GetLastData(int limit) {
 				retval->push_back(*sensor);
 			};
 		lock.unlock();
+        BOOST_LOG_TRIVIAL(info) << "Got " << retval->size() << " rows from database";
 	}
 	catch (exception &e) {
 		lock.unlock();
@@ -120,6 +142,7 @@ vector<SensorData> DBHelper::GetLastData(int limit) {
 }
 
 vector<SensorData> DBHelper::GetByDate(string date) {
+    BOOST_LOG_TRIVIAL(info) << "Trying to get all rows since " << date <<  " from database";
 	vector<SensorData> *retval = new vector<SensorData>();
 	boost::mutex::scoped_lock lock(database_mutex);
 	try {
@@ -134,6 +157,7 @@ vector<SensorData> DBHelper::GetByDate(string date) {
 				retval->push_back(*sensor);
 			};
 		lock.unlock();
+        BOOST_LOG_TRIVIAL(info) << "Got " << retval->size() << " rows from database";
 	}
 	catch (exception &e) {
 		lock.unlock();
@@ -143,6 +167,7 @@ vector<SensorData> DBHelper::GetByDate(string date) {
 }
 
 vector<SensorData> DBHelper::GetBySensorID(int sensorID) {
+    BOOST_LOG_TRIVIAL(info) << "Trying to get all rows for sensorID " << sensorID << " from database";
 	vector<SensorData> *retval = new vector<SensorData>();
 	boost::mutex::scoped_lock lock(database_mutex);
 	try {
@@ -157,6 +182,7 @@ vector<SensorData> DBHelper::GetBySensorID(int sensorID) {
 				retval->push_back(*sensor);
 			};
 		lock.unlock();
+        BOOST_LOG_TRIVIAL(info) << "Got " << retval->size() << " rows from database";
 	}
 	catch (exception &e) {
 		lock.unlock();
@@ -166,6 +192,7 @@ vector<SensorData> DBHelper::GetBySensorID(int sensorID) {
 }
 
 vector<int> DBHelper::GetSensorIDs() {
+    BOOST_LOG_TRIVIAL(info) << "Trying to get sensorsID's from database";
 	vector<int> *retval = new vector<int>();
 	boost::mutex::scoped_lock lock(database_mutex);
 	try {
@@ -174,6 +201,7 @@ vector<int> DBHelper::GetSensorIDs() {
 				retval->push_back(sensorID);
 			};
 		lock.unlock();
+        BOOST_LOG_TRIVIAL(info) << "Got " << retval->size() << " rows from database";
 	}
 	catch (exception &e) {
 		lock.unlock();

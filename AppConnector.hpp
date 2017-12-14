@@ -26,8 +26,8 @@
 class AppConnector {
 private:
 
-    static const int BUF_SIZE = 500;
-    DBHelper *helper;
+    static const int BUF_SIZE = 1024;
+    shared_ptr<DBHelper> helper;
 
     vector<std::string> PrepareAllDataResponse();
     vector<std::string> PrepareDataResponse(int limit);
@@ -40,7 +40,7 @@ public:
     const char *port = "9873";
     void StartListening();
     //AppConnector();
-    explicit AppConnector(const string &filename);
+    explicit AppConnector(shared_ptr<DBHelper> dbObject);
     ~AppConnector();
 };
 

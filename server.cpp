@@ -46,14 +46,16 @@ using namespace zeroconf;
 using namespace boost::log::trivial;
 
 
-void StartSensorConnector(Zeroconf &zeroconf, int interval, std::string dbFile)
+void StartSensorConnector(Zeroconf &zeroconf, int interval, shared_ptr<DBHelper> dbFile)
 {
+    BOOST_LOG_TRIVIAL(info) << "Sensor Connector starting ...";
     SensorConnector sc(zeroconf,interval,dbFile);
     sc.StartCollecting();
 }
 
-void StartAppConnector(std::string dbFile)
+void StartAppConnector(shared_ptr<DBHelper> dbFile)
 {
+    BOOST_LOG_TRIVIAL(info) << "App Connector starting ...";
     AppConnector ap(dbFile);
     ap.StartListening();
 }
@@ -63,9 +65,9 @@ int main(int argc,char *argv[]) {
     ServerHelper serverHelper;
     serverHelper.ParseArguments(argc,argv);
     serverHelper.InitLog();
+    shared_ptr<DBHelper> dbHelper = serverHelper.InitDatabase();
     serverHelper.Daemonize();
     BOOST_LOG_TRIVIAL(info) << "Daemon started";
-
 
     ZeroconfService collector;
     collector.name = serverHelper.GetHostname();
@@ -76,9 +78,14 @@ int main(int argc,char *argv[]) {
     Zeroconf zeroconf;
     zeroconf.AddService(collector);
 
-    thread scThread(StartSensorConnector,ref(zeroconf),serverHelper.GetInterval(),serverHelper.GetDBFileName());
+    BOOST_LOG_TRIVIAL(info) << "Service added to avahi";
+     
+    thread scThread(StartSensorConnector,ref(zeroconf),serverHelper.GetInterval(),dbHelper);
+    BOOST_LOG_TRIVIAL(info) << "Sensor Connector thread started";
     sleep(2);
-    thread apThread(StartAppConnector,serverHelper.GetDBFileName());
+    thread apThread(StartAppConnector,dbHelper);
+    BOOST_LOG_TRIVIAL(info) << "App Connector thread started";
+
     BOOST_LOG_TRIVIAL(info) << "Server Started";
 
     apThread.join();

@@ -24,9 +24,9 @@ private:
     SensorData DownloadData(const char *host, int port);
     Zeroconf *zeroconf;
     int interval;
-    DBHelper* dbHelper;
+    shared_ptr<DBHelper> dbHelper;
 public:
-    SensorConnector(Zeroconf &zeroconf, int interval, std::string dbFile);
+    SensorConnector(Zeroconf &zeroconf, int interval, shared_ptr<DBHelper> dbObject);
     void StartCollecting();
     void StopCollecting();
 };

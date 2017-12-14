@@ -17,6 +17,11 @@
 #include <boost/program_options.hpp>
 #include <boost/log/common.hpp>
 #include "ServerHelper.hpp"
+#include "DBHelper.hpp"
+
+#include <cerrno>
+#include <cstring>
+#include <unistd.h>
 
 namespace logging = boost::log;
 namespace src = boost::log::sources;
@@ -158,7 +163,6 @@ void ServerHelper::Daemonize() {
         }
     }
     BOOST_LOG_TRIVIAL(info) << "Passed first fork";
-    */
     setsid();
     chdir("/");
     umask(0);
@@ -175,4 +179,21 @@ void ServerHelper::Daemonize() {
     close(0);
     close(1);
     close(2);
+    */
+    int daemonize = daemon(0, 0);
+    if (daemonize < 0) {
+        BOOST_LOG_TRIVIAL(fatal) << "Deamonize: Can't daemonize: " << strerror(errno);
+        exit(ERROR_UNHANDLED_EXCEPTION);
+
+    }
+}
+
+shared_ptr<DBHelper> ServerHelper::InitDatabase() {
+    helper = make_shared<DBHelper>(dbFile);
+    if(!helper->InitializeDatabase())
+    {
+        BOOST_LOG_TRIVIAL(fatal) << "Database Initialization failed: " << strerror(errno);
+        exit(ERROR_UNHANDLED_EXCEPTION);
+    }
+    return helper;
 }

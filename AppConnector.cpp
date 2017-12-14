@@ -185,7 +185,6 @@ void AppConnector::StartListening() {
 }*/
 
 AppConnector::~AppConnector() {
-    delete helper;
 }
 
 vector<std::string> AppConnector::PrepareByDateResponse(std::string date) {
@@ -385,8 +384,8 @@ vector<std::string> AppConnector::PrepareSensorIDsResponse() {
     return retval;
 }
 
-AppConnector::AppConnector(const string &filename) {
-    helper = new DBHelper(filename);
+AppConnector::AppConnector(shared_ptr<DBHelper> dbObject) {
+    helper = dbObject;
 }
 
 

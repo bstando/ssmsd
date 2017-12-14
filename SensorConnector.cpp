@@ -10,11 +10,11 @@
 #include <ArduinoJson.h>
 
 
-SensorConnector::SensorConnector(Zeroconf &zeroconf, int interval ,std::string dbFile) {
+SensorConnector::SensorConnector(Zeroconf &zeroconf, int interval, shared_ptr<DBHelper> dbObject) {
     this->zeroconf = &zeroconf;
     this->interval = interval;
-    this->dbFile = dbFile;
-    dbHelper = new DBHelper(dbFile);
+    dbHelper = dbObject;
+    BOOST_LOG_TRIVIAL(info) << "SensorConnector initialized";
 }
 
 SensorData SensorConnector::DownloadData(const char *host, int port) {
@@ -117,7 +117,6 @@ SensorData SensorConnector::DownloadData(const char *host, int port) {
         strftime(timebuffer, 80, "%Y-%m-%d %T", timeinfo);
         sensorResult.setDate(timebuffer);
     }
-
     return sensorResult;
 }
 
@@ -136,17 +135,21 @@ void SensorConnector::StartCollecting() {
             //cout << "Get data from: " << device.ipv4_addresses.at(0).c_str() << ", " << device.port << endl;
             BOOST_LOG_TRIVIAL(info) << "Get data from: " << device.ipv4_addresses.at(0).c_str() << ", " << device.port;
             SensorData data = DownloadData(device.ipv4_addresses.at(0).c_str(), device.port);
-            SaveToDatabase(data);
-            //cout << "Added new data from: " << device.ipv4_addresses.at(0).c_str() << ", " << device.port << endl;
-            BOOST_LOG_TRIVIAL(info) << "Added new data from: " << device.ipv4_addresses.at(0).c_str() << ", " <<
-                                    device.port;
+            if (data.getSensorID() != -1) {
+                SaveToDatabase(data);
+                //cout << "Added new data from: " << device.ipv4_addresses.at(0).c_str() << ", " << device.port << endl;
+                BOOST_LOG_TRIVIAL(info) << "Added new data from: " << device.ipv4_addresses.at(0).c_str() << ", " <<
+                                        device.port;
+            } else {
+                BOOST_LOG_TRIVIAL(error) << "There was error during dowloading data from: "
+                                         << device.ipv4_addresses.at(0).c_str() << ", " << device.port;
+            }
         }
         if (!devices.empty()) {
             //cout << "Saving done. Sleep for " << period << endl;
             BOOST_LOG_TRIVIAL(info) << "Saving done. Sleep for " << interval << " seconds";
             boost::this_thread::sleep_for(boost::chrono::seconds(interval));
-        }
-        else {
+        } else {
             BOOST_LOG_TRIVIAL(info) << "Nothing to do. Sleep for 10 seconds";
             boost::this_thread::sleep_for(boost::chrono::seconds(10));
         }

@@ -6,6 +6,8 @@
 #define SSMSD_SERVERHELPER_HPP
 
 
+#include "DBHelper.hpp"
+
 class ServerHelper {
 private:
     std::string appName;
@@ -13,6 +15,7 @@ private:
     std::string dbFile;
     int interval;
     std::string hostname;
+    shared_ptr<DBHelper> helper;
 public:
     ServerHelper();
     void ShowHelp();
@@ -22,6 +25,7 @@ public:
     std::string GetDBFileName();
     int GetInterval();
     void Daemonize();
+    shared_ptr<DBHelper> InitDatabase();
 };
 
 
